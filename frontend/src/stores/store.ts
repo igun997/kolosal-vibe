@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 import { Message, Session, CodeFile, AIModel } from '../types';
 
-const API_BASE = '/api';
+const API_BASE = import.meta.env.VITE_API_URL || '/api';
 
 interface AppState {
   session: Session | null;
@@ -84,8 +84,14 @@ export const useStore = create<AppState>((set, get) => ({
       const data = await response.json();
 
       // Connect WebSocket
-      const wsProtocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-      const wsUrl = `${wsProtocol}//${window.location.host}/ws/${data.session_id}`;
+      const wsBase = import.meta.env.VITE_WS_URL;
+      let wsUrl: string;
+      if (wsBase) {
+        wsUrl = `${wsBase}/${data.session_id}`;
+      } else {
+        const wsProtocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+        wsUrl = `${wsProtocol}//${window.location.host}/ws/${data.session_id}`;
+      }
       const ws = new WebSocket(wsUrl);
 
       ws.onopen = () => {
