@@ -138,7 +138,7 @@ export const useStore = create<AppState>((set, get) => ({
                 session: {
                   ...session,
                   // Point to our proxy endpoint which handles Daytona auth
-                  previewUrl: `/api/proxy/${session.id}/`,
+                  previewUrl: `${API_BASE}/proxy/${session.id}/`,
                   previewToken: null  // Not needed with proxy
                 },
                 // Increment to trigger auto-reload in PreviewPanel
