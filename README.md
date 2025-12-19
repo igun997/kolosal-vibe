@@ -72,7 +72,19 @@ DAYTONA_API_URL=https://app.daytona.io/api
 
 ## Usage
 
-### Web Mode (Recommended)
+### Docker (Recommended)
+
+```bash
+# Production mode
+docker-compose up -d
+
+# Development mode with hot reload
+docker-compose --profile dev up
+```
+
+Open http://localhost in your browser (production) or http://localhost:5173 (dev).
+
+### Manual Setup
 
 Start the backend and frontend in separate terminals:
 

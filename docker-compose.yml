@@ -1,0 +1,78 @@
+version: '3.8'
+
+services:
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: kolosal-backend
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
+    environment:
+      - KOLOSAL_API_KEY=${KOLOSAL_API_KEY}
+      - DAYTONA_API_KEY=${DAYTONA_API_KEY}
+      - DAYTONA_API_URL=${DAYTONA_API_URL:-https://app.daytona.io/api}
+    env_file:
+      - .env
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/api/models"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: kolosal-frontend
+    restart: unless-stopped
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+
+  # Development mode with hot reload
+  backend-dev:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: kolosal-backend-dev
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./src:/app/src:ro
+      - ./app.py:/app/app.py:ro
+    environment:
+      - KOLOSAL_API_KEY=${KOLOSAL_API_KEY}
+      - DAYTONA_API_KEY=${DAYTONA_API_KEY}
+      - DAYTONA_API_URL=${DAYTONA_API_URL:-https://app.daytona.io/api}
+    env_file:
+      - .env
+    command: ["uvicorn", "app:app", "--host", "0.0.0.0", "--port", "8080", "--reload"]
+    profiles:
+      - dev
+
+  frontend-dev:
+    image: node:20-alpine
+    container_name: kolosal-frontend-dev
+    working_dir: /app
+    restart: unless-stopped
+    ports:
+      - "5173:5173"
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    command: sh -c "npm install && npm run dev -- --host 0.0.0.0"
+    environment:
+      - VITE_API_URL=http://localhost:8080
+    depends_on:
+      - backend-dev
+    profiles:
+      - dev
+
+networks:
+  default:
+    name: kolosal-network
