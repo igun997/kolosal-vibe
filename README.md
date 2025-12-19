@@ -65,9 +65,14 @@ cp .env.example .env
 Create a `.env` file with the following:
 
 ```env
+# API Keys
 KOLOSAL_API_KEY=kol_your_api_key_here
 DAYTONA_API_KEY=dtn_your_api_key_here
 DAYTONA_API_URL=https://app.daytona.io/api
+
+# Ports (Docker)
+BACKEND_PORT=8080
+FRONTEND_PORT=3000
 ```
 
 ## Usage
@@ -82,7 +87,7 @@ docker-compose up -d
 docker-compose --profile dev up
 ```
 
-Open http://localhost in your browser (production) or http://localhost:5173 (dev).
+Open http://localhost:3000 (or your `FRONTEND_PORT`) in production, http://localhost:5173 in dev mode.
 
 ### Manual Setup
 
